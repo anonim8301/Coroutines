@@ -1,13 +1,13 @@
 package com.example.coroutines
 
-import android.content.Context
 import android.os.Bundle
-import android.util.AttributeSet
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coroutines.databinding.ActivityMainBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,19 +20,21 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        GlobalScope.launch(Dispatchers.IO) {
-            Log.d(TAG, "Started in thread: ${Thread.currentThread().name} ")
-            val answer = doNetworkCall()
-            withContext(Dispatchers.Main) {
-                binding.tvCenter.text = answer
-                Log.d(TAG, "Text changed in thread: ${Thread.currentThread().name} ")
+        Log.d(TAG, " Before runBlocking")
+        runBlocking {
+            launch(Dispatchers.IO) {
+                delay(2000L)
+                Log.d(TAG, " IO coroutine 1")
             }
+            launch(Dispatchers.IO) {
+                delay(2000L)
+                Log.d(TAG, " IO coroutine 2")
+            }
+            Log.d(TAG, " Start runBlocking")
+            delay(5000L)
+            Log.d(TAG, "End runBlocking")
         }
-        Log.d(TAG, "Hello from the Main thread: ${Thread.currentThread().name} ")
+        Log.d(TAG, "After runBlocking")
     }
 
-    suspend fun doNetworkCall(): String {
-        delay(2000L)
-        return "The answer"
-    }
 }
