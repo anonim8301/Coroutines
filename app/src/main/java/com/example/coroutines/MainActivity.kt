@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coroutines.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,21 +17,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Log.d(TAG, " Before runBlocking")
-        runBlocking {
-            launch(Dispatchers.IO) {
-                delay(2000L)
-                Log.d(TAG, " IO coroutine 1")
+
+
+        val job = GlobalScope.launch(Dispatchers.Default) {
+            withTimeout(2000){
+                for (i in 4..100) {
+                    if (isActive){
+                        Log.d(TAG, "The result for $i: ${fib(i)}")
+                    }
+                    else{
+                        Log.d(TAG, "Loop was canceled")
+                    }
+                }
             }
-            launch(Dispatchers.IO) {
-                delay(2000L)
-                Log.d(TAG, " IO coroutine 2")
-            }
-            Log.d(TAG, " Start runBlocking")
-            delay(5000L)
-            Log.d(TAG, "End runBlocking")
         }
-        Log.d(TAG, "After runBlocking")
+    }
+
+    private fun fib(n: Int): Long {
+        return if (n == 0) 0
+        else if (n == 1) 1
+        else fib(n - 1) + fib(n - 2)
     }
 
 }
