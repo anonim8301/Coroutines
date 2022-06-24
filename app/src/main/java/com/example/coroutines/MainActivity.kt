@@ -18,25 +18,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-
         val job = GlobalScope.launch(Dispatchers.Default) {
-            withTimeout(2000){
-                for (i in 4..100) {
-                    if (isActive){
-                        Log.d(TAG, "The result for $i: ${fib(i)}")
-                    }
-                    else{
-                        Log.d(TAG, "Loop was canceled")
-                    }
-                }
-            }
+            val answer1 = async { networkCall1() }
+            val answer2 = async { networkCall2() }
+            Log.d(TAG, answer1.await())
+            Log.d(TAG, answer2.await())
         }
     }
 
-    private fun fib(n: Int): Long {
-        return if (n == 0) 0
-        else if (n == 1) 1
-        else fib(n - 1) + fib(n - 2)
+    suspend fun networkCall1():String{
+        delay(2000L)
+        return "Answer 1"
     }
 
+    suspend fun networkCall2():String{
+        delay(2000L)
+        return "Answer 2"
+    }
 }
