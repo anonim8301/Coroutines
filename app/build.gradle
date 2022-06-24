@@ -22,7 +22,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
     compileOptions {
@@ -45,9 +45,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // Coroutines
-    def coroutines_version= "1.6.3"
+    def coroutines_version = "1.6.3"
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
 
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0-rc02")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.0-rc02")
 }

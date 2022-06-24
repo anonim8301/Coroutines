@@ -1,10 +1,14 @@
 package com.example.coroutines
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.coroutines.databinding.ActivityMainBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,22 +21,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        val job = GlobalScope.launch(Dispatchers.Default) {
-            val answer1 = async { networkCall1() }
-            val answer2 = async { networkCall2() }
-            Log.d(TAG, answer1.await())
-            Log.d(TAG, answer2.await())
+        binding.btnMain.setOnClickListener {
+            lifecycleScope.launch {
+                while (true) {
+                    delay(1000)
+                    Log.d(TAG, "Still running...")
+                }
+            }
+            GlobalScope.launch {
+                delay(5000)
+                Intent(this@MainActivity, Second::class.java).also {
+                    startActivity(it)
+                    finish()
+                }
+            }
         }
-    }
-
-    suspend fun networkCall1():String{
-        delay(2000L)
-        return "Answer 1"
-    }
-
-    suspend fun networkCall2():String{
-        delay(2000L)
-        return "Answer 2"
     }
 }
