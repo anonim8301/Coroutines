@@ -2,6 +2,7 @@ package com.example.coroutines
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.coroutines.databinding.ActivityMainBinding
@@ -12,22 +13,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.awaitResponse
+import retrofit2.converter.gson.GsonConverterFactory
 
-
-data class Person(
-    val name: String = "",
-    val age: Int = -1,
-)
+const val BASE_URL = "https://jsonplaceholder.typicode.com/"
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
     private val TAG = "MainActivity"
-
-    override fun onStart() {
-        super.onStart()
-        FirebaseApp.initializeApp(this)
-    }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,21 +30,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val tutorialDocument = Firebase.firestore
-            .collection("coroutines")
-            .document("tutorial")
-        val collectionPath = Firebase.firestore
-            .collection("coroutines")
+        val api  = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(MyAPI::class.java)
 
-        val peter = Person("Peter", 29)
-        val robert = Person("Robert", 20)
-        lifecycleScope.launch(Dispatchers.IO) {
-            collectionPath.document("AceCard").set(robert).await()
-            tutorialDocument.set(peter).await()
-            val person = tutorialDocument.get().await().toObject(Person::class.java)
-            withContext(Dispatchers.Main) {
-                binding.tvMain.text = "Name: ${person?.name} , Age: ${person?.age}"
+        lifecycleScope.launch(Dispatchers.IO){
+            val response = api.getComments()
+            if(response.isSuccessful){
+                for(comment in response.body()!!){
+                    Log.d(TAG, comment.toString())
+                }
             }
         }
+
     }
 }
